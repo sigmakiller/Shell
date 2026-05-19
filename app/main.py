@@ -67,9 +67,9 @@ def main():
                     break
             
             if not found:
-                print(f"(cmd): command not found")
+                print(f"{cmd}: command not found")
 
-                
+
 
         
 
