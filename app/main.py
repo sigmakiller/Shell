@@ -1,17 +1,31 @@
 import sys
 import os
+
+import subprocess
 def main():
     
     builtins=["echo","exit","type"]
     
     while True:
+        
         sys.stdout.write("$ ")
+        
         command=input()
+        
+        parts =command.split()
+        
+        cmd = parts[0]
+        
+        # echo prints
         if command.startswith("echo "):
             print(command[5:])
             continue
+        
+        #exit 
         elif command=="exit":
             break
+        
+        #Search PATH
         elif command.startswith("type"):
             target = command[5: ]
             if target in builtins:
@@ -30,14 +44,33 @@ def main():
                         print(f"{target} is {full_path}")
 
                         found=True
-
-                    
-                        break
+                    break
                 if not found:
                     print(f"{target}: not found")
             continue
 
-        print(f"{command}: command not found")
+        else:
+
+            paths= os.environ["PATH"].split(":")
+
+            found = False
+
+            for path in paths:
+
+                full_path=os.path.join(path,cmd)
+
+                if os.path.isfile(full_path) and os.access(full_path,os.X_OK):
+
+                    subprocess.run(parts)
+
+                    found=True
+                    break
+            
+            if not found:
+                print(f"(cmd): command not found")
+
+                
+
         
 
     
