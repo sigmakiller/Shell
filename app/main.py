@@ -17,7 +17,7 @@ def main():
             if target in builtins:
                 print(f"{target} is a shell builtin")
             else:
-                path = os.environ["PATH"].split(":")
+                paths = os.environ["PATH"].split(":")
 
                 found=False
 
@@ -31,7 +31,10 @@ def main():
 
                         found=True
 
+                    
                         break
+                if not found:
+                    print(f"{target}: not found")
             continue
 
         print(f"{command}: command not found")
