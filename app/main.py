@@ -15,11 +15,11 @@ def main():
         elif command.startswith("type"):
             target = command[5: ]
             if target in builtins:
-                print(f"{target}is a shell bulletin")
+                print(f"{target}is a shell builtin")
             else:
                 print(f"{target}: not found")
             continue
-        
+
         print(f"{command}: command not found")
         
 
