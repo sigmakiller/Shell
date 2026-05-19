@@ -44,11 +44,12 @@ def main():
                         print(f"{target} is {full_path}")
 
                         found=True
-                    break
+                        break
                 if not found:
                     print(f"{target}: not found")
             continue
 
+        # executable programs
         else:
 
             paths= os.environ["PATH"].split(":")
