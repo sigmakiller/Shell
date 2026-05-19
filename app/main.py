@@ -7,9 +7,10 @@ def main():
     while True:
         sys.stdout.write("$ ")
         command=input()
-        print(f"{command}: command not found")
         if command=="exit":
             break
+        print(f"{command}: command not found")
+        
     pass
 
 
