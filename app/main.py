@@ -4,9 +4,9 @@ def main():
    
     
     sys.stdout.write("$ ")
-    
-    command=input()
-    print(f"{command}: command not found")
+    while True:
+        command=input()
+        print(f"{command}: command not found")
     
     pass
 
