@@ -27,7 +27,7 @@ def main():
         
         # print working directory
         elif command =="pwd":
-            print(os.getcwd)
+            print(os.getcwd())
 
         #Search PATH
         elif cmd == "type":
