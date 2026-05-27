@@ -30,7 +30,7 @@ def main():
             print(os.getcwd())
 
         # change directory
-        elif command == "cd":
+        elif cmd == "cd":
 
             if len(parts) < 2:
                 continue
@@ -42,7 +42,7 @@ def main():
 
             else:
                 print(f"cd: {path}: No such file or directory")
-                
+
 
         # type check cmd is builtin or executable
         elif cmd == "type":
