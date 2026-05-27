@@ -4,12 +4,12 @@ import os
 import subprocess
 def main():
     
-    builtins=["echo","exit","type"]
+    builtins=["echo","exit","type","pwd"]
     
     while True:
         
         sys.stdout.write("$ ")
-        
+        sys.stdout.flush()
         command=input()
         
         parts =command.split()
@@ -30,28 +30,35 @@ def main():
             print(os.getcwd)
 
         #Search PATH
-        elif command.startswith("type"):
-            target = command[5: ]
+        elif cmd == "type":
+
+            if len(parts) < 2:
+                continue
+
+            target = parts[1]
+
             if target in builtins:
                 print(f"{target} is a shell builtin")
+
             else:
+
                 paths = os.environ["PATH"].split(":")
 
-                found=False
+                found = False
 
                 for path in paths:
 
-                    full_path = os.path.join(path,target)
+                    full_path = os.path.join(path, target)
 
-                    if os.path.isfile(full_path) and os.access(full_path,os.X_OK):
+                    if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
 
                         print(f"{target} is {full_path}")
 
-                        found=True
+                        found = True
                         break
+
                 if not found:
                     print(f"{target}: not found")
-            continue
 
         # executable programs
         else:
