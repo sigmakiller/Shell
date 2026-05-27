@@ -4,7 +4,7 @@ import os
 import subprocess
 def main():
     
-    builtins=["echo","exit","type","pwd"]
+    builtins=["echo","exit","type","pwd","cd"]
     
     while True:
         
@@ -29,7 +29,22 @@ def main():
         elif command =="pwd":
             print(os.getcwd())
 
-        #Search PATH
+        # change directory
+        elif command == "cd":
+
+            if len(parts) < 2:
+                continue
+
+            path=parts[1]
+
+            if os.path.isdir(path):
+                os.chdir(path)
+
+            else:
+                print(f"cd: {path}: No such file or directory")
+                
+
+        # type check cmd is builtin or executable
         elif cmd == "type":
 
             if len(parts) < 2:
