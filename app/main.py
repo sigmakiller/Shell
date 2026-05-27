@@ -37,6 +37,9 @@ def main():
 
             path=parts[1]
 
+            if path == "~":
+                path = os.environ["HOME"]
+
             if os.path.isdir(path):
                 os.chdir(path)
 
