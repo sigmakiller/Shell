@@ -25,6 +25,10 @@ def main():
         elif command=="exit":
             break
         
+        # print working directory
+        elif command =="pwd":
+            print(os.getcwd)
+
         #Search PATH
         elif command.startswith("type"):
             target = command[5: ]
