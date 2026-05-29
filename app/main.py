@@ -118,7 +118,11 @@ def main():
 
                 if os.path.isfile(full_path) and os.access(full_path,os.X_OK):
 
-                    subprocess.run(parts)
+                    if redirect_file:
+                        with open(redirect_file, "w") as f:
+                            subprocess.run(parts, stdout=f)
+                    else:
+                        subprocess.run(parts)
 
                     found=True
                     break
