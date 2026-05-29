@@ -1,6 +1,6 @@
 import sys
 import os
-
+import shlex
 import subprocess
 def main():
     
@@ -12,7 +12,7 @@ def main():
         sys.stdout.flush()
         command=input()
         
-        parts =command.split()
+        parts =shlex.split(command,posix=True)
         
         cmd = parts[0]
         
