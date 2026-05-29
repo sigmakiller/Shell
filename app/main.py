@@ -11,9 +11,35 @@ def main():
         
         sys.stdout.write("$ ")
         sys.stdout.flush()
-        command=input()
+        
+        try:
+            command = input()
+        except EOFError:
+            break
         
         parts =shlex.split(command,posix=True)
+        
+        if len(parts)==0:
+            continue
+
+        #Handle stdout redirection
+        redirect_file =None
+
+        if  ">" in parts:
+            idx = parts.index(">")
+            redirect_file = parts[idx+1]
+            parts = parts[:idx]
+
+
+        elif "1>" in parts:
+            idx = parts.index(">")
+            redirect_file = parts[idx+1]
+            parts = parts[:idx]      
+        
+        
+        
+        if len(parts) == 0:
+            continue
         
         cmd = parts[0]
         
@@ -23,11 +49,11 @@ def main():
             continue
         
         #exit 
-        elif command=="exit":
+        elif cmd =="exit":
             break
         
         # print working directory
-        elif command =="pwd":
+        elif cmd =="pwd":
             print(os.getcwd())
 
         # change directory
