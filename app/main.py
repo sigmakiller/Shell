@@ -43,7 +43,14 @@ def main():
         
         # echo prints
         if cmd == "echo":
-            print(" ".join(parts[1:]))
+            output = " ".join(parts[1:])
+
+            if redirect_file:
+                with open(redirect_file, "w") as f:
+                    f.write(output + "\n")
+            else:
+                print(output)
+
             continue
         
         #exit 
