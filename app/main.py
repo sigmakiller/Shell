@@ -23,19 +23,17 @@ def main():
             continue
 
         #Handle stdout redirection
-        redirect_file =None
+        redirect_file = None
 
-        if  ">" in parts:
-            idx = parts.index(">")
-            redirect_file = parts[idx+1]
+        if "1>" in parts:
+            idx = parts.index("1>")
+            redirect_file = parts[idx + 1]
             parts = parts[:idx]
 
-
-        elif "1>" in parts:
+        elif ">" in parts:
             idx = parts.index(">")
-            redirect_file = parts[idx+1]
-            parts = parts[:idx]      
-        
+            redirect_file = parts[idx + 1]
+            parts = parts[:idx]
         
         
         if len(parts) == 0:
