@@ -1,85 +1,105 @@
-import cmd
 import sys
 import os
 import shlex
 import subprocess
+
+
 def main():
-    
-    builtins=["echo","exit","type","pwd","cd"]
-    
+
+    builtins = ["echo", "exit", "type", "pwd", "cd"]
+
     while True:
-        
+
         sys.stdout.write("$ ")
         sys.stdout.flush()
-        
+
         try:
             command = input()
         except EOFError:
             break
-        
-        parts =shlex.split(command,posix=True)
-        
-        if len(parts)==0:
+
+        parts = shlex.split(command, posix=True)
+
+        if len(parts) == 0:
             continue
 
-        #Handle stdout redirection
-        redirect_file = None
+        stdout_redirect = None
+        stderr_redirect = None
 
-        if "1>" in parts:
+        if "2>" in parts:
+            idx = parts.index("2>")
+            stderr_redirect = parts[idx + 1]
+            parts = parts[:idx]
+
+        elif "1>" in parts:
             idx = parts.index("1>")
-            redirect_file = parts[idx + 1]
+            stdout_redirect = parts[idx + 1]
             parts = parts[:idx]
 
         elif ">" in parts:
             idx = parts.index(">")
-            redirect_file = parts[idx + 1]
+            stdout_redirect = parts[idx + 1]
             parts = parts[:idx]
-        
-        
+
         if len(parts) == 0:
             continue
-        
+
         cmd = parts[0]
-        
-        # echo prints
+
+        # echo
         if cmd == "echo":
+
             output = " ".join(parts[1:])
 
-            if redirect_file:
-                with open(redirect_file, "w") as f:
+            if stdout_redirect:
+                with open(stdout_redirect, "w") as f:
                     f.write(output + "\n")
             else:
                 print(output)
 
-            continue
-        
-        #exit 
-        elif cmd =="exit":
-            break
-        
-        # print working directory
-        elif cmd =="pwd":
-            print(os.getcwd())
+            if stderr_redirect:
+                open(stderr_redirect, "w").close()
 
-        # change directory
+            continue
+
+        # exit
+        elif cmd == "exit":
+            break
+
+        # pwd
+        elif cmd == "pwd":
+
+            output = os.getcwd()
+
+            if stdout_redirect:
+                with open(stdout_redirect, "w") as f:
+                    f.write(output + "\n")
+            else:
+                print(output)
+
+            if stderr_redirect:
+                open(stderr_redirect, "w").close()
+
+        # cd
         elif cmd == "cd":
 
             if len(parts) < 2:
                 continue
 
-            path=parts[1]
-
-            if path == "~":
-                path = os.environ["HOME"]
+            path = os.path.expanduser(parts[1])
 
             if os.path.isdir(path):
                 os.chdir(path)
-
             else:
-                print(f"cd: {path}: No such file or directory")
+                error_msg = f"cd: {parts[1]}: No such file or directory"
 
+                if stderr_redirect:
+                    with open(stderr_redirect, "w") as f:
+                        f.write(error_msg + "\n")
+                else:
+                    print(error_msg)
 
-        # type check cmd is builtin or executable
+        # type
         elif cmd == "type":
 
             if len(parts) < 2:
@@ -88,60 +108,75 @@ def main():
             target = parts[1]
 
             if target in builtins:
-                print(f"{target} is a shell builtin")
-
+                output = f"{target} is a shell builtin"
             else:
 
                 paths = os.environ["PATH"].split(":")
-
-                found = False
+                output = None
 
                 for path in paths:
 
                     full_path = os.path.join(path, target)
 
                     if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
-
-                        print(f"{target} is {full_path}")
-
-                        found = True
+                        output = f"{target} is {full_path}"
                         break
 
-                if not found:
-                    print(f"{target}: not found")
+                if output is None:
+                    output = f"{target}: not found"
 
-        # executable programs
+            if stdout_redirect:
+                with open(stdout_redirect, "w") as f:
+                    f.write(output + "\n")
+            else:
+                print(output)
+
+            if stderr_redirect:
+                open(stderr_redirect, "w").close()
+
+        # external commands
         else:
 
-            paths= os.environ["PATH"].split(":")
-
+            paths = os.environ["PATH"].split(":")
             found = False
 
             for path in paths:
 
-                full_path=os.path.join(path,cmd)
+                full_path = os.path.join(path, cmd)
 
-                if os.path.isfile(full_path) and os.access(full_path,os.X_OK):
+                if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
 
-                    if redirect_file:
-                        with open(redirect_file, "w") as f:
-                            subprocess.run(parts, stdout=f)
+                    if stdout_redirect and stderr_redirect:
+
+                        with open(stdout_redirect, "w") as out:
+                            with open(stderr_redirect, "w") as err:
+                                subprocess.run(parts, stdout=out, stderr=err)
+
+                    elif stdout_redirect:
+
+                        with open(stdout_redirect, "w") as out:
+                            subprocess.run(parts, stdout=out)
+
+                    elif stderr_redirect:
+
+                        with open(stderr_redirect, "w") as err:
+                            subprocess.run(parts, stderr=err)
+
                     else:
+
                         subprocess.run(parts)
 
-                    found=True
+                    found = True
                     break
-            
+
             if not found:
-                print(f"{cmd}: command not found")
+                error_msg = f"{cmd}: command not found"
 
-
-
-        
-
-    
-    pass
-
+                if stderr_redirect:
+                    with open(stderr_redirect, "w") as f:
+                        f.write(error_msg + "\n")
+                else:
+                    print(error_msg)
 
 
 if __name__ == "__main__":
