@@ -1,3 +1,4 @@
+import cmd
 import sys
 import os
 import shlex
@@ -17,8 +18,8 @@ def main():
         cmd = parts[0]
         
         # echo prints
-        if command.startswith("echo "):
-            print(command[5:])
+        if cmd == "echo":
+            print(" ".join(parts[1:]))
             continue
         
         #exit 
