@@ -6,6 +6,27 @@ import readline
 
 BUILTINS = ["echo", "exit"]
 
+def get_executables():
+    executables = set()
+
+    for path in os.environ.get("PATH", "").split(":"):
+
+        if not os.path.isdir(path):
+            continue
+
+        try:
+            for file in os.listdir(path):
+
+                full_path = os.path.join(path, file)
+
+                if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
+                    executables.add(file)
+
+        except OSError:
+            pass
+
+    return executables
+
 
 def completer(text, state):
     matches = [cmd + " " for cmd in BUILTINS if cmd.startswith(text)]
