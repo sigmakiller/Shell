@@ -300,12 +300,15 @@ def read_line():
                         sys.stdout.flush()
 
                     # Second TAB
-                    else:
-                        print()
-                        print("  ".join(matches))
-
+                    # Second TAB
+                    else:                   
+                        sys.stdout.write("\r\n")
+                        sys.stdout.write("  ".join(matches))
+                        sys.stdout.write("\r\n")
                         sys.stdout.write("$ " + buffer)
                         sys.stdout.flush()
+
+                        tab_count = 0
 
             else:
                 buffer += ch
