@@ -312,8 +312,7 @@ def read_line():
 
             else:
                 buffer += ch
-                sys.stdout.write(ch)
-                sys.stdout.flush()
+
 
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
