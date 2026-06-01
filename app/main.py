@@ -29,13 +29,25 @@ def get_executables():
 
 
 def completer(text, state):
-    matches = [cmd + " " for cmd in BUILTINS if cmd.startswith(text)]
+
+    matches = []
+
+    # Builtins
+    for cmd in BUILTINS:
+        if cmd.startswith(text):
+            matches.append(cmd + " ")
+
+    # Executables in PATH
+    for exe in get_executables():
+        if exe.startswith(text):
+            matches.append(exe + " ")
+
+    matches.sort()
 
     if state < len(matches):
         return matches[state]
 
     return None
-
 
 readline.set_completer(completer)
 readline.parse_and_bind("tab: complete")
