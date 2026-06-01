@@ -147,7 +147,8 @@ def execute_command(command):
 
         for path in os.environ["PATH"].split(":"):
 
-        full_path = os.path.join(path, cmd)
+            full_path = os.path.join(path, cmd)
+            
             if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
 
                 if stdout_redirect and stderr_redirect:
