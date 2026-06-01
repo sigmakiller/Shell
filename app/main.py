@@ -2,7 +2,8 @@ import sys
 import os
 import shlex
 import subprocess
-import readline
+import tty
+import termios
 
 BUILTINS = ["echo", "exit"]
 
@@ -224,23 +225,108 @@ def completer(text, state):
         return matches[state]
 
     return None
-readline.set_completer(completer)
-readline.parse_and_bind("tab: complete")
-readline.parse_and_bind("set show-all-if-ambiguous on")
 
+def read_line():
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+
+    buffer = ""
+    last_prefix = ""
+    tab_count = 0
+
+    try:
+        tty.setraw(fd)
+
+        while True:
+            ch = sys.stdin.read(1)
+
+            # Enter
+            if ch in ("\r", "\n"):
+                print()
+                return buffer
+
+            # Backspace
+            elif ch == "\x7f":
+                if buffer:
+                    buffer = buffer[:-1]
+                    sys.stdout.write("\b \b")
+                    sys.stdout.flush()
+
+            # Tab
+            elif ch == "\t":
+
+                matches = []
+
+                for cmd in BUILTINS:
+                    if cmd.startswith(buffer):
+                        matches.append(cmd)
+
+                for exe in get_executables():
+                    if exe.startswith(buffer):
+                        matches.append(exe)
+
+                matches = sorted(set(matches))
+
+                # No matches
+                if len(matches) == 0:
+                    sys.stdout.write("\a")
+                    sys.stdout.flush()
+
+                # Single match
+                elif len(matches) == 1:
+
+                    completion = matches[0]
+
+                    if completion != buffer:
+                        remainder = completion[len(buffer):] + " "
+
+                        sys.stdout.write(remainder)
+                        sys.stdout.flush()
+
+                        buffer = completion + " "
+
+                # Multiple matches
+                else:
+
+                    if buffer == last_prefix:
+                        tab_count += 1
+                    else:
+                        last_prefix = buffer
+                        tab_count = 1
+
+                    # First TAB
+                    if tab_count == 1:
+                        sys.stdout.write("\a")
+                        sys.stdout.flush()
+
+                    # Second TAB
+                    else:
+                        print()
+                        print("  ".join(matches))
+
+                        sys.stdout.write("$ " + buffer)
+                        sys.stdout.flush()
+
+            else:
+                buffer += ch
+                sys.stdout.write(ch)
+                sys.stdout.flush()
+
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 def main():
-    
 
     while True:
         sys.stdout.write("$ ")
         sys.stdout.flush()
 
         try:
-            command = input()
+            command = read_line()
         except EOFError:
             break
 
+        execute_command(command)
         
 
 
