@@ -2,6 +2,22 @@ import sys
 import os
 import shlex
 import subprocess
+import readline
+
+BUILTINS = ["echo", "exit"]
+
+
+def completer(text, state):
+    matches = [cmd + " " for cmd in BUILTINS if cmd.startswith(text)]
+
+    if state < len(matches):
+        return matches[state]
+
+    return None
+
+
+readline.set_completer(completer)
+readline.parse_and_bind("tab: complete")
 
 
 def main():
