@@ -23,7 +23,9 @@ def main():
 
         stdout_redirect = None
         stderr_redirect = None
+
         stdout_mode = "w"
+        stderr_mode = "w"
 
         # stdout append
         if "1>>" in parts:
@@ -38,21 +40,31 @@ def main():
             stdout_mode = "a"
             parts = parts[:idx]
 
-        # stderr redirect
-        elif "2>" in parts:
-            idx = parts.index("2>")
+        # stderr append
+        elif "2>>" in parts:
+            idx = parts.index("2>>")
             stderr_redirect = parts[idx + 1]
+            stderr_mode = "a"
             parts = parts[:idx]
 
         # stdout overwrite
         elif "1>" in parts:
             idx = parts.index("1>")
             stdout_redirect = parts[idx + 1]
+            stdout_mode = "w"
             parts = parts[:idx]
 
         elif ">" in parts:
             idx = parts.index(">")
             stdout_redirect = parts[idx + 1]
+            stdout_mode = "w"
+            parts = parts[:idx]
+
+        # stderr overwrite
+        elif "2>" in parts:
+            idx = parts.index("2>")
+            stderr_redirect = parts[idx + 1]
+            stderr_mode = "w"
             parts = parts[:idx]
 
         if not parts:
@@ -71,7 +83,7 @@ def main():
                 print(output)
 
             if stderr_redirect:
-                open(stderr_redirect, "w").close()
+                open(stderr_redirect, stderr_mode).close()
 
         # exit
         elif cmd == "exit":
@@ -89,6 +101,7 @@ def main():
 
         # cd
         elif cmd == "cd":
+
             if len(parts) < 2:
                 continue
 
@@ -100,13 +113,14 @@ def main():
                 error_msg = f"cd: {parts[1]}: No such file or directory"
 
                 if stderr_redirect:
-                    with open(stderr_redirect, "w") as f:
+                    with open(stderr_redirect, stderr_mode) as f:
                         f.write(error_msg + "\n")
                 else:
                     print(error_msg)
 
         # type
         elif cmd == "type":
+
             if len(parts) < 2:
                 continue
 
@@ -118,6 +132,7 @@ def main():
                 output = None
 
                 for path in os.environ["PATH"].split(":"):
+
                     full_path = os.path.join(path, target)
 
                     if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
@@ -135,37 +150,44 @@ def main():
 
         # external commands
         else:
+
             found = False
 
             for path in os.environ["PATH"].split(":"):
+
                 full_path = os.path.join(path, cmd)
 
                 if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
 
                     if stdout_redirect and stderr_redirect:
+
                         with open(stdout_redirect, stdout_mode) as out:
-                            with open(stderr_redirect, "w") as err:
+                            with open(stderr_redirect, stderr_mode) as err:
                                 subprocess.run(parts, stdout=out, stderr=err)
 
                     elif stdout_redirect:
+
                         with open(stdout_redirect, stdout_mode) as out:
                             subprocess.run(parts, stdout=out)
 
                     elif stderr_redirect:
-                        with open(stderr_redirect, "w") as err:
+
+                        with open(stderr_redirect, stderr_mode) as err:
                             subprocess.run(parts, stderr=err)
 
                     else:
+
                         subprocess.run(parts)
 
                     found = True
                     break
 
             if not found:
+
                 error_msg = f"{cmd}: command not found"
 
                 if stderr_redirect:
-                    with open(stderr_redirect, "w") as f:
+                    with open(stderr_redirect, stderr_mode) as f:
                         f.write(error_msg + "\n")
                 else:
                     print(error_msg)
