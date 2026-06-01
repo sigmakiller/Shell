@@ -5,11 +5,9 @@ import subprocess
 
 
 def main():
-
     builtins = ["echo", "exit", "type", "pwd", "cd"]
 
     while True:
-
         sys.stdout.write("$ ")
         sys.stdout.flush()
 
@@ -20,17 +18,33 @@ def main():
 
         parts = shlex.split(command, posix=True)
 
-        if len(parts) == 0:
+        if not parts:
             continue
 
         stdout_redirect = None
         stderr_redirect = None
+        stdout_mode = "w"
 
-        if "2>" in parts:
+        # stdout append
+        if "1>>" in parts:
+            idx = parts.index("1>>")
+            stdout_redirect = parts[idx + 1]
+            stdout_mode = "a"
+            parts = parts[:idx]
+
+        elif ">>" in parts:
+            idx = parts.index(">>")
+            stdout_redirect = parts[idx + 1]
+            stdout_mode = "a"
+            parts = parts[:idx]
+
+        # stderr redirect
+        elif "2>" in parts:
             idx = parts.index("2>")
             stderr_redirect = parts[idx + 1]
             parts = parts[:idx]
 
+        # stdout overwrite
         elif "1>" in parts:
             idx = parts.index("1>")
             stdout_redirect = parts[idx + 1]
@@ -41,26 +55,23 @@ def main():
             stdout_redirect = parts[idx + 1]
             parts = parts[:idx]
 
-        if len(parts) == 0:
+        if not parts:
             continue
 
         cmd = parts[0]
 
         # echo
         if cmd == "echo":
-
             output = " ".join(parts[1:])
 
             if stdout_redirect:
-                with open(stdout_redirect, "w") as f:
+                with open(stdout_redirect, stdout_mode) as f:
                     f.write(output + "\n")
             else:
                 print(output)
 
             if stderr_redirect:
                 open(stderr_redirect, "w").close()
-
-            continue
 
         # exit
         elif cmd == "exit":
@@ -68,21 +79,16 @@ def main():
 
         # pwd
         elif cmd == "pwd":
-
             output = os.getcwd()
 
             if stdout_redirect:
-                with open(stdout_redirect, "w") as f:
+                with open(stdout_redirect, stdout_mode) as f:
                     f.write(output + "\n")
             else:
                 print(output)
 
-            if stderr_redirect:
-                open(stderr_redirect, "w").close()
-
         # cd
         elif cmd == "cd":
-
             if len(parts) < 2:
                 continue
 
@@ -101,7 +107,6 @@ def main():
 
         # type
         elif cmd == "type":
-
             if len(parts) < 2:
                 continue
 
@@ -110,12 +115,9 @@ def main():
             if target in builtins:
                 output = f"{target} is a shell builtin"
             else:
-
-                paths = os.environ["PATH"].split(":")
                 output = None
 
-                for path in paths:
-
+                for path in os.environ["PATH"].split(":"):
                     full_path = os.path.join(path, target)
 
                     if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
@@ -126,44 +128,34 @@ def main():
                     output = f"{target}: not found"
 
             if stdout_redirect:
-                with open(stdout_redirect, "w") as f:
+                with open(stdout_redirect, stdout_mode) as f:
                     f.write(output + "\n")
             else:
                 print(output)
 
-            if stderr_redirect:
-                open(stderr_redirect, "w").close()
-
         # external commands
         else:
-
-            paths = os.environ["PATH"].split(":")
             found = False
 
-            for path in paths:
-
+            for path in os.environ["PATH"].split(":"):
                 full_path = os.path.join(path, cmd)
 
                 if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
 
                     if stdout_redirect and stderr_redirect:
-
-                        with open(stdout_redirect, "w") as out:
+                        with open(stdout_redirect, stdout_mode) as out:
                             with open(stderr_redirect, "w") as err:
                                 subprocess.run(parts, stdout=out, stderr=err)
 
                     elif stdout_redirect:
-
-                        with open(stdout_redirect, "w") as out:
+                        with open(stdout_redirect, stdout_mode) as out:
                             subprocess.run(parts, stdout=out)
 
                     elif stderr_redirect:
-
                         with open(stderr_redirect, "w") as err:
                             subprocess.run(parts, stderr=err)
 
                     else:
-
                         subprocess.run(parts)
 
                     found = True
