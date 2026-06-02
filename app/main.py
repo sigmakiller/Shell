@@ -5,7 +5,7 @@ import subprocess
 import tty
 import termios
 
-BUILTINS = ["echo", "exit"]
+BUILTINS = ["echo", "exit", "type", "pwd", "cd"]
 
 
 def execute_command(command):
@@ -312,7 +312,8 @@ def read_line():
 
             else:
                 buffer += ch
-
+                sys.stdout.write(ch)
+                sys.stdout.flush()
 
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
