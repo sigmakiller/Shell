@@ -226,6 +226,19 @@ def completer(text, state):
 
     return None
 
+
+def longest_common_prefix(strings):
+    if not strings:
+        return ""
+
+    prefix = strings[0]
+
+    for s in strings[1:]:
+        while not s.startswith(prefix):
+            prefix = prefix[:-1]
+
+    return prefix
+
 def read_line():
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
@@ -286,31 +299,40 @@ def read_line():
 
                         buffer = completion + " "
 
-                # Multiple matches
+# Multiple matches
                 else:
 
-                    if buffer == last_prefix:
-                        tab_count += 1
-                    else:
-                        last_prefix = buffer
-                        tab_count = 1
+                    lcp = longest_common_prefix(matches)
 
-                    # First TAB
-                    if tab_count == 1:
-                        sys.stdout.write("\a")
+                    if len(lcp) > len(buffer):
+
+                        completion = lcp[len(buffer):]
+
+                        sys.stdout.write(completion)
                         sys.stdout.flush()
 
-                    # Second TAB
-                    # Second TAB
-                    else:                   
-                        sys.stdout.write("\r\n")
-                        sys.stdout.write("  ".join(matches))
-                        sys.stdout.write("\r\n")
-                        sys.stdout.write("$ " + buffer)
-                        sys.stdout.flush()
+                        buffer = lcp
 
-                        tab_count = 0
+                        else:
 
+                            if buffer == last_prefix:
+                                tab_count += 1
+                            else:
+                                last_prefix = buffer
+                                tab_count = 1
+
+                            if tab_count == 1:
+                                sys.stdout.write("\a")
+                                sys.stdout.flush()
+
+                            else:
+                                sys.stdout.write("\r\n")
+                                sys.stdout.write("  ".join(matches))
+                                sys.stdout.write("\r\n")
+                                sys.stdout.write("$ " + buffer)
+                                sys.stdout.flush()
+
+                                tab_count = 0
             else:
                 buffer += ch
                 sys.stdout.write(ch)
