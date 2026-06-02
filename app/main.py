@@ -268,7 +268,42 @@ def read_line():
 
             # Tab
             elif ch == "\t":
+                if " " in buffer:
 
+                    prefix = buffer.split()[-1]
+
+                    matches = []
+
+                    for file in os.listdir("."):
+                        if file.startswith(prefix):
+                            matches.append(file)
+
+                    matches.sort()
+
+                    if len(matches) == 1:
+
+                        completion = matches[0]
+                        remainder = completion[len(prefix):] + " "
+
+                        sys.stdout.write(remainder)
+                        sys.stdout.flush()
+
+                        buffer += remainder
+
+                    elif len(matches) > 1:
+
+                        lcp = longest_common_prefix(matches)
+
+                        if len(lcp) > len(prefix):
+
+                            remainder = lcp[len(prefix):]
+
+                            sys.stdout.write(remainder)
+                            sys.stdout.flush()
+
+                            buffer += remainder
+
+                    continue
                 matches = []
 
                 for cmd in BUILTINS:
