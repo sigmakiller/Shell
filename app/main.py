@@ -242,7 +242,8 @@ def read_line():
 
             # Enter
             if ch in ("\r", "\n"):
-                print()
+                sys.stdout.write("\r\n")
+                sys.stdout.flush()
                 return buffer
 
             # Backspace
