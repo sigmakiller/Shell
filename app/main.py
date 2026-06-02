@@ -313,26 +313,27 @@ def read_line():
 
                         buffer = lcp
 
+                        
+                    else:
+
+                        if buffer == last_prefix:
+                            tab_count += 1
                         else:
+                            last_prefix = buffer
+                            tab_count = 1
 
-                            if buffer == last_prefix:
-                                tab_count += 1
-                            else:
-                                last_prefix = buffer
-                                tab_count = 1
+                        if tab_count == 1:
+                            sys.stdout.write("\a")
+                            sys.stdout.flush()
 
-                            if tab_count == 1:
-                                sys.stdout.write("\a")
-                                sys.stdout.flush()
+                        else:
+                            sys.stdout.write("\r\n")
+                            sys.stdout.write("  ".join(matches))
+                            sys.stdout.write("\r\n")
+                            sys.stdout.write("$ " + buffer)
+                            sys.stdout.flush()
 
-                            else:
-                                sys.stdout.write("\r\n")
-                                sys.stdout.write("  ".join(matches))
-                                sys.stdout.write("\r\n")
-                                sys.stdout.write("$ " + buffer)
-                                sys.stdout.flush()
-
-                                tab_count = 0
+                            tab_count = 0
             else:
                 buffer += ch
                 sys.stdout.write(ch)
