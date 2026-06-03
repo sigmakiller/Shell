@@ -309,21 +309,21 @@ def read_line():
                         else:
                             full_match = os.path.join(".", completion)
 
-                        remainder = completion[len(prefix):]
+                        remainder = completion
 
                         if os.path.isdir(full_match):
 
                             sys.stdout.write(remainder + "/")
                             sys.stdout.flush()
 
-                            buffer += remainder + "/"
+                            buffer = buffer[:-len(token)] + remainder + "/"
 
                         else:
 
                             sys.stdout.write(remainder + " ")
                             sys.stdout.flush()
 
-                            buffer += remainder + " "
+                            buffer = buffer[:-len(token)] + completion + " "
                     elif len(matches) > 1:
 
                         lcp = longest_common_prefix(matches)
