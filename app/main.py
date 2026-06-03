@@ -270,13 +270,31 @@ def read_line():
             elif ch == "\t":
                 if " " in buffer:
 
-                    prefix = buffer.split()[-1]
+                    token = buffer.split()[-1]
 
-                    matches = []
+                    if "/" in token:
 
-                    for file in os.listdir("."):
-                        if file.startswith(prefix):
-                            matches.append(file)
+                        dir_path, prefix = token.rsplit("/", 1)
+
+                        try:
+                            matches = []
+
+                            for entry in os.listdir(dir_path):
+                                if entry.startswith(prefix):
+                                    matches.append(f"{dir_path}/{entry}")
+
+                        except OSError:
+                            matches = []
+
+                    else:
+
+                        prefix = token
+
+                        matches = []
+
+                        for entry in os.listdir("."):
+                            if entry.startswith(prefix):
+                                matches.append(entry)
 
                     matches.sort()
 
