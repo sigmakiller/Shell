@@ -319,14 +319,20 @@ def read_line():
                             sys.stdout.write(remainder + "/")
                             sys.stdout.flush()
 
-                            buffer = buffer[:-len(token)] + remainder + "/"
+                            if "/" in token:
+                                buffer = buffer[:-len(token)] + dir_path + "/" + completion + "/"
+                            else:
+                                buffer = buffer[:-len(token)] + completion + "/"
 
                         else:
 
                             sys.stdout.write(remainder + " ")
                             sys.stdout.flush()
 
-                            buffer = buffer[:-len(token)] + completion + " "
+                            if "/" in token:
+                                buffer = buffer[:-len(token)] + dir_path + "/" + completion + " "
+                            else:
+                                buffer = buffer[:-len(token)] + completion + " "
                     elif len(matches) > 1:
 
                         lcp = longest_common_prefix(matches)
