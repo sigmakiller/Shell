@@ -324,7 +324,6 @@ def read_line():
                             sys.stdout.flush()
 
                             buffer += remainder + " "
-
                     elif len(matches) > 1:
 
                         lcp = longest_common_prefix(matches)
@@ -333,12 +332,26 @@ def read_line():
 
                             remainder = lcp[len(prefix):]
 
-                            sys.stdout.write(remainder)
-                            sys.stdout.flush()
+                            if "/" in token:
+                                full_match = os.path.join(dir_path, lcp)
+                            else:
+                                full_match = os.path.join(".", lcp)
 
-                            buffer += remainder
+                            if os.path.isdir(full_match):
 
-                    continue
+                                sys.stdout.write(remainder + "/")
+                                sys.stdout.flush()
+
+                                buffer += remainder + "/"
+
+                            else:
+
+                                sys.stdout.write(remainder)
+                                sys.stdout.flush()
+
+                                buffer += remainder
+
+                continue
                 matches = []
 
                 for cmd in BUILTINS:
