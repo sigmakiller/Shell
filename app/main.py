@@ -301,12 +301,27 @@ def read_line():
                     if len(matches) == 1:
 
                         completion = matches[0]
-                        remainder = completion[len(prefix):] 
+                        remainder = completion[len(prefix):]
 
-                        sys.stdout.write(remainder +  " ")
-                        sys.stdout.flush()
+                        # Build full path for directory check
+                        if "/" in token:
+                            full_match = f"{dir_path}/{completion}"
+                        else:
+                            full_match = completion
 
-                        buffer += remainder + " "
+                        if os.path.isdir(full_match):
+
+                            sys.stdout.write(remainder + "/")
+                            sys.stdout.flush()
+
+                            buffer += remainder + "/"
+
+                        else:
+
+                            sys.stdout.write(remainder + " ")
+                            sys.stdout.flush()
+
+                            buffer += remainder + " "
 
                     elif len(matches) > 1:
 
