@@ -324,33 +324,42 @@ def read_line():
                         continue
                     elif len(matches) > 1:
 
-                        lcp = longest_common_prefix(matches)
+                        if token == last_prefix:
+                            tab_count += 1
+                        else:
+                            last_prefix = token
+                            tab_count = 1
 
-                        if len(lcp) > len(prefix):
+                        if tab_count == 1:
 
-                            remainder = lcp[len(prefix):]
-
-                            if "/" in token:
-                                full_match = os.path.join(dir_path, lcp)
-                            else:
-                                full_match = os.path.join(".", lcp)
-
-                            if os.path.isdir(full_match):
-
-                                sys.stdout.write(remainder + "/")
-                                sys.stdout.flush()
-
-                                buffer += remainder + "/"
-
-                            else:
-
-                                sys.stdout.write(remainder)
-                                sys.stdout.flush()
-
-                                buffer += remainder
+                            sys.stdout.write("\a")
                             sys.stdout.flush()
 
-                        continue
+                        else:
+
+                            display_matches = []
+
+                            for match in sorted(matches):
+
+                                if "/" in token:
+                                    full_path = os.path.join(dir_path, match)
+                                else:
+                                    full_path = match
+
+                                if os.path.isdir(full_path):
+                                    display_matches.append(match + "/")
+                                else:
+                                    display_matches.append(match)
+
+                            sys.stdout.write("\r\n")
+                            sys.stdout.write("  ".join(display_matches))
+                            sys.stdout.write("\r\n")
+                            sys.stdout.write("$ " + buffer)
+                            sys.stdout.flush()
+
+                            tab_count = 0
+
+                        continue                    
                 matches = []
 
                 for cmd in BUILTINS:
