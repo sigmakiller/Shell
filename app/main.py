@@ -350,8 +350,9 @@ def read_line():
                                 sys.stdout.flush()
 
                                 buffer += remainder
+                            sys.stdout.flush()
 
-                    continue
+                        continue
                 matches = []
 
                 for cmd in BUILTINS:
