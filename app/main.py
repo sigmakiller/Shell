@@ -281,7 +281,7 @@ def read_line():
 
                             for entry in os.listdir(dir_path):
                                 if entry.startswith(prefix):
-                                    matches.append(f"{dir_path}/{entry}")
+                                    matches.append(entry)
 
                         except OSError:
                             matches = []
@@ -301,12 +301,12 @@ def read_line():
                     if len(matches) == 1:
 
                         completion = matches[0]
-                        remainder = completion[len(prefix):] + " "
+                        remainder = completion[len(prefix):] 
 
-                        sys.stdout.write(remainder)
+                        sys.stdout.write(remainder + + " ")
                         sys.stdout.flush()
 
-                        buffer += remainder
+                        buffer += remainder + " "
 
                     elif len(matches) > 1:
 
