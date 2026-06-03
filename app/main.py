@@ -303,7 +303,7 @@ def read_line():
                         completion = matches[0]
                         remainder = completion[len(prefix):] 
 
-                        sys.stdout.write(remainder + + " ")
+                        sys.stdout.write(remainder +  " ")
                         sys.stdout.flush()
 
                         buffer += remainder + " "
