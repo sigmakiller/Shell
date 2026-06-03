@@ -268,9 +268,12 @@ def read_line():
 
             # Tab
             elif ch == "\t":
-                if " " in buffer:
+                if " " in buffer or buffer.endswith(" "):
 
-                    token = buffer.split()[-1]
+                    if buffer.endswith(" "):
+                        token = ""
+                    else:
+                        token = buffer.split()[-1]
 
                     if "/" in token:
 
