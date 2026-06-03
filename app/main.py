@@ -301,7 +301,7 @@ def read_line():
                     if len(matches) == 1:
 
                         completion = matches[0]
-                        remainder = completion[len(prefix):]
+                      
 
                         # Build full path for directory check
                         if "/" in token:
@@ -309,6 +309,7 @@ def read_line():
                         else:
                             full_match = os.path.join(".", completion)
 
+                        remainder = completion[len(prefix):]
 
                         if os.path.isdir(full_match):
 
