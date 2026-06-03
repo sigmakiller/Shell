@@ -304,35 +304,24 @@ def read_line():
                     if len(matches) == 1:
 
                         completion = matches[0]
-                      
 
-                        # Build full path for directory check
                         if "/" in token:
                             full_match = os.path.join(dir_path, completion)
                         else:
-                            full_match = os.path.join(".", completion)
+                            full_match = completion
 
-                        remainder = completion
+                        remainder = completion[len(prefix):]
 
                         if os.path.isdir(full_match):
-
                             sys.stdout.write(remainder + "/")
                             sys.stdout.flush()
-
-                            if "/" in token:
-                                buffer = buffer[:-len(token)] + dir_path + "/" + completion + "/"
-                            else:
-                                buffer = buffer[:-len(token)] + completion + "/"
-
+                            buffer += remainder + "/"
                         else:
-
                             sys.stdout.write(remainder + " ")
                             sys.stdout.flush()
+                            buffer += remainder + " "
 
-                            if "/" in token:
-                                buffer = buffer[:-len(token)] + dir_path + "/" + completion + " "
-                            else:
-                                buffer = buffer[:-len(token)] + completion + " "
+                        continue
                     elif len(matches) > 1:
 
                         lcp = longest_common_prefix(matches)
