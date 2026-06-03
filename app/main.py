@@ -305,9 +305,10 @@ def read_line():
 
                         # Build full path for directory check
                         if "/" in token:
-                            full_match = f"{dir_path}/{completion}"
+                            full_match = os.path.join(dir_path, completion)
                         else:
-                            full_match = completion
+                            full_match = os.path.join(".", completion)
+
 
                         if os.path.isdir(full_match):
 
