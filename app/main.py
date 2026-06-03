@@ -351,7 +351,7 @@ def read_line():
 
                                 buffer += remainder
 
-                continue
+                    continue
                 matches = []
 
                 for cmd in BUILTINS:
