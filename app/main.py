@@ -7,6 +7,8 @@ import termios
 
 BUILTINS = ["echo", "exit", "type", "pwd", "cd","complete"]
 
+completion_specs={}
+
 
 def execute_command(command):
     builtins = ["echo", "exit", "type", "pwd", "cd","complete"]
@@ -112,11 +114,30 @@ def execute_command(command):
                 print(error_msg)
     
     elif cmd=="complete":
-        if len(parts) >= 3 and parts[1] == "-p":
-            target = parts[2]
-            print(f"complete: {target}: no completion specification")
-        else:
-            pass
+    # Register
+        if len(parts) >= 4 and parts[1] == "-C":
+
+            script_path = parts[2]
+            command_name = parts[3]
+
+            completion_specs[command_name] = script_path
+
+    # Print
+        elif len(parts) >= 3 and parts[1] == "-p":
+
+            command_name = parts[2]
+
+            if command_name in completion_specs:
+
+                print(
+                    f"complete -C '{completion_specs[command_name]}' {command_name}"
+                )
+
+            else:
+
+                print(
+                    f"complete: {command_name}: no completion specification"
+                )
         
         
     # type
