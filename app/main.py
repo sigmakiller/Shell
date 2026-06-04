@@ -112,8 +112,14 @@ def execute_command(command):
                 print(error_msg)
     
     elif cmd=="complete":
-        pass
-        # type
+        if len(parts) >= 3 and parts[1] == "-p":
+            target = parts[2]
+            print(f"complete: {target}: no completion specification")
+        else:
+            pass
+        
+        
+    # type
     elif cmd == "type":
 
         if len(parts) < 2:
