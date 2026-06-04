@@ -9,7 +9,7 @@ BUILTINS = ["echo", "exit", "type", "pwd", "cd","complete"]
 
 
 def execute_command(command):
-    builtins = ["echo", "exit", "type", "pwd", "cd"]
+    builtins = ["echo", "exit", "type", "pwd", "cd","complete"]
     parts = shlex.split(command, posix=True)
 
     if not parts:
@@ -112,7 +112,7 @@ def execute_command(command):
                 print(error_msg)
     
     elif cmd=="complete":
-        return
+        pass
         # type
     elif cmd == "type":
 
