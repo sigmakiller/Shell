@@ -301,7 +301,7 @@ def read_line():
  # Registered completer
                 parts = buffer.split()
 
-                if len(parts) == 1 and not buffer.endswith(" "):
+                if len(parts) == 1 and  buffer.endswith(" "):
 
                     cmd = parts[0]
 
