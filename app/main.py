@@ -5,7 +5,7 @@ import subprocess
 import tty
 import termios
 
-BUILTINS = ["echo", "exit", "type", "pwd", "cd"]
+BUILTINS = ["echo", "exit", "type", "pwd", "cd","complete"]
 
 
 def execute_command(command):
@@ -110,7 +110,9 @@ def execute_command(command):
                     f.write(error_msg + "\n")
             else:
                 print(error_msg)
-
+    
+    elif cmd=="complete":
+        return
         # type
     elif cmd == "type":
 
