@@ -319,7 +319,7 @@ def read_line():
 
                             if candidate:
 
-                                sys.stdout.write(" " + candidate + " ")
+                                sys.stdout.write( candidate + " ")
                                 sys.stdout.flush()
 
                                 buffer += " " + candidate + " "
