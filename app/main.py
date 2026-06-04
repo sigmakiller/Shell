@@ -297,6 +297,40 @@ def read_line():
 
             # Tab
             elif ch == "\t":
+                
+ # Registered completer
+                parts = buffer.split()
+
+                if len(parts) == 1 and not buffer.endswith(" "):
+
+                    cmd = parts[0]
+
+                    if cmd in completion_specs:
+
+                        try:
+
+                            result = subprocess.run(
+                                [completion_specs[cmd]],
+                                capture_output=True,
+                                text=True
+                            )
+
+                            candidate = result.stdout.strip()
+
+                            if candidate:
+
+                                sys.stdout.write(" " + candidate + " ")
+                                sys.stdout.flush()
+
+                                buffer += " " + candidate + " "
+
+                                continue
+
+                        except Exception:
+                            pass               
+                
+
+  
                 if " " in buffer or buffer.endswith(" "):
 
                     if buffer.endswith(" "):
