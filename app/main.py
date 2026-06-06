@@ -301,34 +301,62 @@ def read_line():
  # Registered completer
                 parts = buffer.split()
 
-                if len(parts) == 1 and  buffer.endswith(" "):
+                if len(parts) >= 1:
 
                     cmd = parts[0]
 
                     if cmd in completion_specs:
 
+                        if buffer.endswith(" "):
+                            current_word = ""
+                            previous_word = parts[-1]
+                        else:
+                            current_word = parts[-1]
+
+                            if len(parts) >= 2:
+                                previous_word = parts[-2]
+                            else:
+                                previous_word = ""
+
                         try:
 
                             result = subprocess.run(
-                                [completion_specs[cmd]],
+                                [
+                                    completion_specs[cmd],
+                                    cmd,
+                                    current_word,
+                                    previous_word
+                                ],
                                 capture_output=True,
                                 text=True
                             )
 
-                            candidate = result.stdout.strip()
+                            candidates = result.stdout.strip().splitlines()
 
-                            if candidate:
+                            if len(candidates) == 1:
 
-                                sys.stdout.write( candidate + " ")
-                                sys.stdout.flush()
+                                candidate = candidates[0]
 
-                                buffer += " " + candidate + " "
+                                if current_word:
+
+                                    remainder = candidate[len(current_word):]
+
+                                    sys.stdout.write(remainder + " ")
+                                    sys.stdout.flush()
+
+                                    buffer += remainder + " "
+
+                                else:
+
+                                    sys.stdout.write(candidate + " ")
+                                    sys.stdout.flush()
+
+                                    buffer += candidate + " "
 
                                 continue
 
                         except Exception:
-                            pass               
-                
+                            pass
 
   
                 if " " in buffer or buffer.endswith(" "):
