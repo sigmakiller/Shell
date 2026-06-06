@@ -320,16 +320,22 @@ def read_line():
 
                         try:
 
+                            env = os.environ.copy()
+
+                            env["COMP_LINE"] = buffer
+                            env["COMP_POINT"] = str(len(buffer))
+
                             result = subprocess.run(
-                                [
-                                    completion_specs[cmd],
-                                    cmd,
-                                    current_word,
-                                    previous_word
-                                ],
-                                capture_output=True,
-                                text=True
-                            )
+                            [
+                                completion_specs[cmd],
+                                cmd,
+                                current_word,
+                                previous_word
+                            ],
+                            capture_output=True,
+                            text=True,
+                            env=env
+                        )
 
                             candidates = result.stdout.strip().splitlines()
 
