@@ -122,7 +122,15 @@ def execute_command(command):
 
             completion_specs[command_name] = script_path
 
-    # Print
+        # Remove
+        elif len(parts) >= 3 and parts[1] == "-r":
+
+            command_name = parts[2]
+
+            if command_name in completion_specs:
+                del completion_specs[command_name]      
+    
+    # Print    
         elif len(parts) >= 3 and parts[1] == "-p":
 
             command_name = parts[2]
