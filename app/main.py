@@ -337,7 +337,9 @@ def read_line():
                             env=env
                         )
 
-                            candidates = result.stdout.strip().splitlines()
+                            candidates = sorted(
+                                [c.strip() for c in result.stdout.splitlines() if c.strip()]
+                            )
 
                             if len(candidates) == 1:
 
@@ -360,6 +362,33 @@ def read_line():
                                     buffer += candidate + " "
 
                                 continue
+
+                            elif len(candidates) > 1:
+
+                                if buffer == last_prefix:
+                                    tab_count += 1
+                                else:
+                                    last_prefix = buffer
+                                    tab_count = 1
+
+    # First TAB -> bell
+                                if tab_count == 1:
+
+                                    sys.stdout.write("\a")
+                                    sys.stdout.flush()
+
+    # Second TAB -> show all candidates
+                                else:
+
+                                    sys.stdout.write("\r\n")
+                                    sys.stdout.write("  ".join(candidates))
+                                    sys.stdout.write("\r\n")
+                                    sys.stdout.write("$ " + buffer)
+                                    sys.stdout.flush()
+
+                                    tab_count = 0
+
+                                continue                            
 
                         except Exception:
                             pass
