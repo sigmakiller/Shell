@@ -365,33 +365,44 @@ def read_line():
 
                             elif len(candidates) > 1:
 
-                                if buffer == last_prefix:
-                                    tab_count += 1
-                                else:
-                                    last_prefix = buffer
-                                    tab_count = 1
+                                lcp = longest_common_prefix(candidates)
 
-    # First TAB -> bell
-                                if tab_count == 1:
+    # LCP extends current input
+                                if len(lcp) > len(current_word):
 
-                                    sys.stdout.write("\a")
+                                    remainder = lcp[len(current_word):]
+
+                                    sys.stdout.write(remainder)
                                     sys.stdout.flush()
 
-    # Second TAB -> show all candidates
+                                    buffer += remainder
+
                                 else:
 
-                                    sys.stdout.write("\r\n")
-                                    sys.stdout.write("  ".join(candidates))
-                                    sys.stdout.write("\r\n")
-                                    sys.stdout.write("$ " + buffer)
-                                    sys.stdout.flush()
+                                    if buffer == last_prefix:
+                                        tab_count += 1
+                                    else:
+                                        last_prefix = buffer
+                                        tab_count = 1
 
-                                    tab_count = 0
+        # First TAB -> bell
+                                    if tab_count == 1:
+
+                                        sys.stdout.write("\a")
+                                        sys.stdout.flush()
+
+        # Second TAB -> show matches
+                                    else:
+
+                                        sys.stdout.write("\r\n")
+                                        sys.stdout.write("  ".join(sorted(candidates)))
+                                        sys.stdout.write("\r\n")
+                                        sys.stdout.write("$ " + buffer)
+                                        sys.stdout.flush()
+
+                                        tab_count = 0
 
                                 continue                            
-
-                        except Exception:
-                            pass
 
   
                 if " " in buffer or buffer.endswith(" "):
