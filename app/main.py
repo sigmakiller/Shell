@@ -301,7 +301,7 @@ def read_line():
  # Registered completer
                 parts = buffer.split()
 
-                if len(parts) >= 1:
+                if len(parts) >= 1:             
 
                     cmd = parts[0]
 
@@ -321,26 +321,26 @@ def read_line():
                         try:
 
                             env = os.environ.copy()
-
                             env["COMP_LINE"] = buffer
                             env["COMP_POINT"] = str(len(buffer))
 
                             result = subprocess.run(
-                            [
-                                completion_specs[cmd],
-                                cmd,
-                                current_word,
-                                previous_word
-                            ],
-                            capture_output=True,
-                            text=True,
-                            env=env
-                        )
+                                [
+                                    completion_specs[cmd],
+                                    cmd,
+                                    current_word,
+                                    previous_word,
+                                ],
+                                capture_output=True,
+                                text=True,
+                                env=env
+                            )
 
                             candidates = sorted(
                                 [c.strip() for c in result.stdout.splitlines() if c.strip()]
                             )
 
+            # One candidate
                             if len(candidates) == 1:
 
                                 candidate = candidates[0]
@@ -363,11 +363,12 @@ def read_line():
 
                                 continue
 
+            # Multiple candidates
                             elif len(candidates) > 1:
 
                                 lcp = longest_common_prefix(candidates)
 
-    # LCP extends current input
+                # LCP extends current input
                                 if len(lcp) > len(current_word):
 
                                     remainder = lcp[len(current_word):]
@@ -385,24 +386,27 @@ def read_line():
                                         last_prefix = buffer
                                         tab_count = 1
 
-        # First TAB -> bell
+                    # First TAB -> bell
                                     if tab_count == 1:
 
                                         sys.stdout.write("\a")
                                         sys.stdout.flush()
 
-        # Second TAB -> show matches
+                    # Second TAB -> show candidates
                                     else:
 
                                         sys.stdout.write("\r\n")
-                                        sys.stdout.write("  ".join(sorted(candidates)))
+                                        sys.stdout.write("  ".join(candidates))
                                         sys.stdout.write("\r\n")
                                         sys.stdout.write("$ " + buffer)
                                         sys.stdout.flush()
 
                                         tab_count = 0
 
-                                continue                            
+                                continue
+
+                        except Exception:
+                            pass                            
 
   
                 if " " in buffer or buffer.endswith(" "):
