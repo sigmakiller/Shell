@@ -5,13 +5,13 @@ import subprocess
 import tty
 import termios
 
-BUILTINS = ["echo", "exit", "type", "pwd", "cd","complete"]
+BUILTINS = ["echo", "exit", "type", "pwd", "cd","complete","jobs"]
 
 completion_specs={}
 
 
 def execute_command(command):
-    builtins = ["echo", "exit", "type", "pwd", "cd","complete"]
+    builtins = ["echo", "exit", "type", "pwd", "cd","complete","jobs"]
     parts = shlex.split(command, posix=True)
 
     if not parts:
@@ -146,8 +146,14 @@ def execute_command(command):
                 print(
                     f"complete: {command_name}: no completion specification"
                 )
-        
-        
+
+
+    #Background Jobs    
+    elif cmd == "jobs":
+        return    
+    
+    
+    
     # type
     elif cmd == "type":
 
