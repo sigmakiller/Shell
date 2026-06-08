@@ -8,11 +8,20 @@ import termios
 BUILTINS = ["echo", "exit", "type", "pwd", "cd","complete","jobs"]
 
 completion_specs={}
-
+job_counter = 1
 
 def execute_command(command):
+    global job_counter
+    
     builtins = ["echo", "exit", "type", "pwd", "cd","complete","jobs"]
     parts = shlex.split(command, posix=True)
+
+    background = False
+
+    if parts and parts[-1] == "&":
+        background = True
+        parts = parts[:-1]
+
 
     if not parts:
         return
@@ -199,24 +208,83 @@ def execute_command(command):
 
                     with open(stdout_redirect, stdout_mode) as out:
                         with open(stderr_redirect, stderr_mode) as err:
-                            subprocess.run(parts, stdout=out, stderr=err)
+
+                            if background:
+
+                                proc = subprocess.Popen(
+                                    parts,
+                                    stdout=out,
+                                    stderr=err
+                                )
+
+                                print(f"[{job_counter}] {proc.pid}")
+                                job_counter += 1
+
+                            else:
+
+                                subprocess.run(
+                                    parts,
+                                    stdout=out,
+                                    stderr=err
+                                )
 
                 elif stdout_redirect:
 
                     with open(stdout_redirect, stdout_mode) as out:
-                        subprocess.run(parts, stdout=out)
+
+                        if background:
+
+                            proc = subprocess.Popen(
+                                parts,
+                                stdout=out
+                            )
+
+                            print(f"[{job_counter}] {proc.pid}")
+                            job_counter += 1
+
+                        else:
+
+                            subprocess.run(
+                                parts,
+                                stdout=out
+                            )
 
                 elif stderr_redirect:
 
                     with open(stderr_redirect, stderr_mode) as err:
-                        subprocess.run(parts, stderr=err)
+
+                        if background:
+
+                            proc = subprocess.Popen(
+                                parts,
+                                stderr=err
+                            )
+
+                            print(f"[{job_counter}] {proc.pid}")
+                            job_counter += 1
+
+                        else:
+
+                            subprocess.run(
+                                parts,
+                                stderr=err
+                            )
 
                 else:
 
-                    subprocess.run(parts)
+                    if background:
+
+                        proc = subprocess.Popen(parts)
+
+                        print(f"[{job_counter}] {proc.pid}")
+                        job_counter += 1
+
+                    else:
+
+                        subprocess.run(parts)
 
                 found = True
-                break
+                break           
 
         if not found:
 
