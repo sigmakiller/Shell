@@ -183,26 +183,31 @@ def execute_command(command):
     #Background Jobs    
     elif cmd == "jobs":
 
-        running_jobs = [
-            job for job in jobs_list
-            if job["process"].poll() is None
-        ]
+        running_jobs = []
+
+        for job in jobs_list:
+
+            if job["process"].poll() is None:
+                running_jobs.append(job)
+                running_jobs.sort(key=lambda j: j["job_id"])
 
         running_jobs.sort(key=lambda j: j["job_id"])
+
+        count = len(running_jobs)
 
         for i, job in enumerate(running_jobs):
 
             marker = " "
 
-            if i == len(running_jobs) - 1:
-                marker = "+"
-
-            elif i == len(running_jobs) - 2:
+            if count >= 2 and i == count - 2:
                 marker = "-"
+
+            if i == count - 1:
+                marker = "+"
 
             print(
                 f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
-            )    
+            )         
     
     # type
     elif cmd == "type":
