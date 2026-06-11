@@ -195,27 +195,41 @@ def execute_command(command):
     #Background Jobs    
     elif cmd == "jobs":
 
-        running_jobs = sorted(
-            [job for job in jobs_list if job["process"].poll() is None],
-            key=lambda j: j["job_id"]
-        )
+        count = len(jobs_list)
 
-        count = len(running_jobs)
+        for i, job in enumerate(jobs_list):
 
-        for i, job in enumerate(running_jobs):
+            if count == 1:
+                marker = "+"
 
-            marker = " "
+            elif i == count - 1:
+                marker = "+"
 
-            if count >= 2:
-                if i == count - 1:
-                    marker = "+"
-                elif i == count - 2:
-                    marker = "-"
+            elif i == count - 2:
+                marker = "-"
+
+            else:
+                marker = " "
+
+            status = (
+                "Running"
+                if job["process"].poll() is None
+                else "Done"
+            )
+
+            command_text = job["command"]
+
+            if status == "Done":
+                command_text = command_text.replace(" &", "")
 
             print(
-                f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
-            )       
-    # type
+                f"[{job['job_id']}]{marker}  {status:<24}{command_text}"
+            )
+
+        jobs_list[:] = [
+            job for job in jobs_list
+            if job["process"].poll() is None
+        ]   
     elif cmd == "type":
 
         if len(parts) < 2:
