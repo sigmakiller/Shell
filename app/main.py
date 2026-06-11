@@ -16,8 +16,6 @@ def reap_jobs():
 
     remaining_jobs = []
 
-    done_jobs = []
-
     for job in jobs_list:
 
         if job["process"].poll() is None:
@@ -27,12 +25,10 @@ def reap_jobs():
         else:
 
             print(
-                f"[{job['job_id']}]+  {'Done':<24}{job['command'].replace(' &','')}"
+                f"[{job['job_id']}]+  {'Done':<24}{job['command'].replace(' &', '')}"
             )
 
     jobs_list = remaining_jobs
-
-    return done_jobs
 
 
 
