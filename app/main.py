@@ -161,15 +161,27 @@ def execute_command(command):
 
     #Background Jobs    
     elif cmd == "jobs":
+
+        running_jobs = []
+
         for job in jobs_list:
-
             if job["process"].poll() is None:
+                running_jobs.append(job)
 
-                print(
-                    f"[{job['job_id']}]+  {'Running':<24}{job['command']}"
-                )  
-    
-    
+        for i, job in enumerate(running_jobs):
+
+            if i == len(running_jobs) - 1:
+                marker = "+"      # newest job
+
+            elif i == len(running_jobs) - 2:
+                marker = "-"      # second newest
+
+            else:
+                marker = " "      # all others
+
+            print(
+                f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
+            )
     
     # type
     elif cmd == "type":
