@@ -187,21 +187,15 @@ def execute_command(command):
 
             marker = " "
 
-            if len(running_jobs) >= 1 and job == running_jobs[-1]:
+            if i == len(running_jobs) - 1:
                 marker = "+"
 
-            elif len(running_jobs) >= 2 and job == running_jobs[-2]:
+            elif i == len(running_jobs) - 2:
                 marker = "-"
 
             print(
                 f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
-            )
-
-    # remove completed jobs AFTER printing them
-        jobs_list[:] = [
-            job for job in jobs_list
-            if job["process"].poll() is None
-        ]   
+            )    
     
     # type
     elif cmd == "type":
@@ -736,9 +730,10 @@ def read_line():
 
 def main():
 
-
-
     while True:
+
+        # Reap BEFORE printing prompt
+        reap_jobs()
 
         sys.stdout.write("$ ")
         sys.stdout.flush()
@@ -749,8 +744,6 @@ def main():
             break
 
         execute_command(command)
-
-        reap_jobs()
 
 
 if __name__ == "__main__":
