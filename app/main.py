@@ -9,6 +9,8 @@ BUILTINS = ["echo", "exit", "type", "pwd", "cd","complete","jobs"]
 
 completion_specs={}
 job_counter = 1
+jobs_list = []
+
 
 def execute_command(command):
     global job_counter
@@ -159,7 +161,13 @@ def execute_command(command):
 
     #Background Jobs    
     elif cmd == "jobs":
-        return    
+        for job in jobs_list:
+
+            if job["process"].poll() is None:
+
+                print(
+                    f"[{job['job_id']}]+  {'Running':<24}{job['command']}"
+                )  
     
     
     
@@ -195,13 +203,12 @@ def execute_command(command):
 
         # external commands
     else:
-
         found = False
 
         for path in os.environ["PATH"].split(":"):
 
             full_path = os.path.join(path, cmd)
-            
+
             if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
 
                 if stdout_redirect and stderr_redirect:
@@ -212,10 +219,17 @@ def execute_command(command):
                             if background:
 
                                 proc = subprocess.Popen(
-                                    parts,
+                            parts,
                                     stdout=out,
                                     stderr=err
                                 )
+
+                                jobs_list.append({
+                                    "job_id": job_counter,
+                                    "pid": proc.pid,
+                                    "process": proc,
+                                    "command": command,
+                                })
 
                                 print(f"[{job_counter}] {proc.pid}")
                                 job_counter += 1
@@ -239,6 +253,13 @@ def execute_command(command):
                                 stdout=out
                             )
 
+                            jobs_list.append({
+                                "job_id": job_counter,
+                                "pid": proc.pid,
+                                "process": proc,
+                                "command": command,
+                            })
+
                             print(f"[{job_counter}] {proc.pid}")
                             job_counter += 1
 
@@ -260,6 +281,13 @@ def execute_command(command):
                                 stderr=err
                             )
 
+                            jobs_list.append({
+                                "job_id": job_counter,
+                                "pid": proc.pid,
+                                "process": proc,
+                                "command": command,
+                            })
+
                             print(f"[{job_counter}] {proc.pid}")
                             job_counter += 1
 
@@ -276,6 +304,13 @@ def execute_command(command):
 
                         proc = subprocess.Popen(parts)
 
+                        jobs_list.append({
+                            "job_id": job_counter,
+                            "pid": proc.pid,
+                            "process": proc,
+                            "command": command,
+                        })
+
                         print(f"[{job_counter}] {proc.pid}")
                         job_counter += 1
 
@@ -284,7 +319,7 @@ def execute_command(command):
                         subprocess.run(parts)
 
                 found = True
-                break           
+                break
 
         if not found:
 
@@ -294,8 +329,7 @@ def execute_command(command):
                 with open(stderr_redirect, stderr_mode) as f:
                     f.write(error_msg + "\n")
             else:
-                print(error_msg)
-
+                print(error_msg)        
 
 def get_executables():
     executables = set()
