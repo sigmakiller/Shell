@@ -183,12 +183,25 @@ def execute_command(command):
     #Background Jobs    
     elif cmd == "jobs":
 
-        reap_jobs()
+
 
         running_jobs = [
             job for job in jobs_list
             if job["process"].poll() is None
-        ]   
+        ]
+
+        for i, job in enumerate(running_jobs):
+
+            if i == len(running_jobs) - 1:
+                marker = "+"
+            elif i == len(running_jobs) - 2:
+                marker = "-"
+            else:
+                marker = " "
+
+            print(
+                f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
+         ) 
 
     # remove completed jobs AFTER printing them
         jobs_list[:] = [
