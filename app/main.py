@@ -11,6 +11,26 @@ completion_specs={}
 job_counter = 1
 jobs_list = []
 
+def reap_jobs():
+    global jobs_list
+
+    remaining_jobs = []
+
+    done_jobs = []
+
+    for job in jobs_list:
+
+        if job["process"].poll() is None:
+
+            remaining_jobs.append(job)
+
+        else:
+
+            done_jobs.append(job)
+
+    jobs_list = remaining_jobs
+
+    return done_jobs
 
 def execute_command(command):
     global job_counter
@@ -162,45 +182,40 @@ def execute_command(command):
     #Background Jobs    
     elif cmd == "jobs":
 
-        displayed_jobs = []
+        done_jobs = reap_jobs()
+
+        for i, job in enumerate(done_jobs):
+
+            marker = "+"
+
+            print(
+                f"[{job['job_id']}]{marker}  {'Done':<24}{job['command'].replace(' &', '')}"
+            )
+
+        running_jobs = []
 
         for job in jobs_list:
 
             if job["process"].poll() is None:
 
-                displayed_jobs.append({
-                    "job": job,
-                    "status": "Running"
-            })
+                running_jobs.append(job)
 
-            else:
+        for i, job in enumerate(running_jobs):
 
-                displayed_jobs.append({
-                    "job": job,
-                    "status": "Done"
-                })
+            if i == len(running_jobs) - 1:
 
-        for i, item in enumerate(displayed_jobs):
-
-            job = item["job"]
-            status = item["status"]
-
-            if i == len(displayed_jobs) - 1:
                 marker = "+"
 
-            elif i == len(displayed_jobs) - 2:
+            elif i == len(running_jobs) - 2:
+
                 marker = "-"
 
             else:
+
                 marker = " "
 
-            command_text = job["command"]
-
-            if status == "Done":
-                command_text = command_text.replace(" &", "")
-
             print(
-                f"[{job['job_id']}]{marker}  {status:<24}{command_text}"
+                f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
             )
 
     # remove completed jobs AFTER printing them
@@ -743,6 +758,14 @@ def read_line():
 def main():
 
     while True:
+        done_jobs = reap_jobs()
+
+        for job in done_jobs:
+
+            print(
+                f"[{job['job_id']}]+  {'Done':<24}{job['command'].replace(' &', '')}"
+            )
+        
         sys.stdout.write("$ ")
         sys.stdout.flush()
 
