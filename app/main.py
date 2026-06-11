@@ -744,13 +744,7 @@ def read_line():
 def main():
 
     while True:
-        done_jobs = reap_jobs()
-
-        for job in done_jobs:
-
-            print(
-                f"[{job['job_id']}]+  {'Done':<24}{job['command'].replace(' &', '')}"
-            )
+        reap_jobs()
         
         sys.stdout.write("$ ")
         sys.stdout.flush()
