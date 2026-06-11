@@ -14,12 +14,21 @@ jobs_list = []
 def reap_jobs():
     global jobs_list
 
-    jobs_list[:] = [
-        job
-        for job in jobs_list
-        if job["process"].poll() is None
-    ]
+    remaining_jobs = []
 
+    for job in jobs_list:
+
+        if job["process"].poll() is None:
+
+            remaining_jobs.append(job)
+
+        else:
+
+            print(
+                f"[{job['job_id']}]+  {'Done':<24}{job['command'].replace(' &', '')}"
+            )
+
+    jobs_list = remaining_jobs
 
 
 
@@ -179,20 +188,7 @@ def execute_command(command):
         running_jobs = [
             job for job in jobs_list
             if job["process"].poll() is None
-        ]
-
-        for i, job in enumerate(running_jobs):
-
-            if i == len(running_jobs) - 1:
-                marker = "+"
-            elif i == len(running_jobs) - 2:
-                marker = "-"
-            else:
-                marker = " "
-
-            print(
-                f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
-            )
+        ]   
 
     # remove completed jobs AFTER printing them
         jobs_list[:] = [
@@ -733,9 +729,10 @@ def read_line():
 
 def main():
 
+
+
     while True:
-        reap_jobs()
-        
+
         sys.stdout.write("$ ")
         sys.stdout.flush()
 
@@ -745,7 +742,8 @@ def main():
             break
 
         execute_command(command)
-        
+
+        reap_jobs()
 
 
 if __name__ == "__main__":
