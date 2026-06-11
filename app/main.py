@@ -14,22 +14,35 @@ jobs_list = []
 def reap_jobs():
     global jobs_list
 
+    done_jobs = []
     remaining_jobs = []
 
     for job in jobs_list:
-
         if job["process"].poll() is None:
-
             remaining_jobs.append(job)
-
         else:
+            done_jobs.append(job)
 
-            print(
-                f"[{job['job_id']}]+  {'Done':<24}{job['command'].replace(' &', '')}"
-            )
+    all_jobs = sorted(jobs_list, key=lambda j: j["job_id"])
+
+    for job in done_jobs:
+
+        marker = " "
+
+        if len(all_jobs) >= 2:
+            if job["job_id"] == all_jobs[-1]["job_id"]:
+                marker = "+"
+            elif job["job_id"] == all_jobs[-2]["job_id"]:
+                marker = "-"
+
+        elif len(all_jobs) == 1:
+            marker = "+"
+
+        print(
+            f"[{job['job_id']}]{marker}  {'Done':<24}{job['command'].replace(' &', '')}"
+        )
 
     jobs_list = remaining_jobs
-
 
 
 def execute_command(command):
@@ -182,15 +195,10 @@ def execute_command(command):
     #Background Jobs    
     elif cmd == "jobs":
 
-        running_jobs = []
-
-        for job in jobs_list:
-
-            if job["process"].poll() is None:
-                running_jobs.append(job)
-                running_jobs.sort(key=lambda j: j["job_id"])
-
-        running_jobs.sort(key=lambda j: j["job_id"])
+        running_jobs = sorted(
+            [job for job in jobs_list if job["process"].poll() is None],
+            key=lambda j: j["job_id"]
+        )
 
         count = len(running_jobs)
 
@@ -198,11 +206,12 @@ def execute_command(command):
 
             marker = " "
 
-            if count >= 2 and i == count - 2:
-                marker = "-"
-
-            if i == count - 1:
+            if count == 1:
                 marker = "+"
+            elif i == count - 1:
+                marker = "+"
+            elif i == count - 2:
+                marker = "-"
 
             print(
                 f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
