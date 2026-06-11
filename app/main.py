@@ -8,7 +8,7 @@ import termios
 BUILTINS = ["echo", "exit", "type", "pwd", "cd","complete","jobs"]
 
 completion_specs={}
-job_counter = 1
+
 jobs_list = []
 
 def reap_jobs():
@@ -45,8 +45,18 @@ def reap_jobs():
     jobs_list = remaining_jobs
 
 
+def next_job_id():
+    used = {job["job_id"] for job in jobs_list}
+
+    job_id = 1
+
+    while job_id in used:
+        job_id += 1
+
+    return job_id
+
 def execute_command(command):
-    global job_counter
+    
     
     builtins = ["echo", "exit", "type", "pwd", "cd","complete","jobs"]
     parts = shlex.split(command, posix=True)
@@ -282,15 +292,16 @@ def execute_command(command):
                                     stderr=err
                                 )
 
+                                job_id = next_job_id()
+
                                 jobs_list.append({
-                                    "job_id": job_counter,
-                                    "pid": proc.pid,
+                                    "job_id": job_id,
+                                                                "pid": proc.pid,
                                     "process": proc,
                                     "command": command,
                                 })
 
-                                print(f"[{job_counter}] {proc.pid}")
-                                job_counter += 1
+                                print(f"[{job_id}] {proc.pid}")                             
 
                             else:
 
@@ -311,15 +322,16 @@ def execute_command(command):
                                 stdout=out
                             )
 
+                            job_id = next_job_id()
+
                             jobs_list.append({
-                                "job_id": job_counter,
+                                "job_id": job_id,
                                 "pid": proc.pid,
                                 "process": proc,
                                 "command": command,
                             })
 
-                            print(f"[{job_counter}] {proc.pid}")
-                            job_counter += 1
+                            print(f"[{job_id}] {proc.pid}")                         
 
                         else:
 
@@ -339,15 +351,16 @@ def execute_command(command):
                                 stderr=err
                             )
 
+                            job_id = next_job_id()
+
                             jobs_list.append({
-                                "job_id": job_counter,
+                                "job_id": job_id,
                                 "pid": proc.pid,
                                 "process": proc,
                                 "command": command,
                             })
 
-                            print(f"[{job_counter}] {proc.pid}")
-                            job_counter += 1
+                            print(f"[{job_id}] {proc.pid}")                         
 
                         else:
 
@@ -362,16 +375,16 @@ def execute_command(command):
 
                         proc = subprocess.Popen(parts)
 
+                        job_id = next_job_id()
+
                         jobs_list.append({
-                            "job_id": job_counter,
+                            "job_id": job_id,
                             "pid": proc.pid,
                             "process": proc,
                             "command": command,
                         })
 
-                        print(f"[{job_counter}] {proc.pid}")
-                        job_counter += 1
-
+                        print(f"[{job_id}] {proc.pid}")                     
                     else:
 
                         subprocess.run(parts)
