@@ -162,26 +162,52 @@ def execute_command(command):
     #Background Jobs    
     elif cmd == "jobs":
 
-        running_jobs = []
+        displayed_jobs = []
 
         for job in jobs_list:
+
             if job["process"].poll() is None:
-                running_jobs.append(job)
 
-        for i, job in enumerate(running_jobs):
-
-            if i == len(running_jobs) - 1:
-                marker = "+"      # newest job
-
-            elif i == len(running_jobs) - 2:
-                marker = "-"      # second newest
+                displayed_jobs.append({
+                    "job": job,
+                    "status": "Running"
+            })
 
             else:
-                marker = " "      # all others
+
+                displayed_jobs.append({
+                    "job": job,
+                    "status": "Done"
+                })
+
+        for i, item in enumerate(displayed_jobs):
+
+            job = item["job"]
+            status = item["status"]
+
+            if i == len(displayed_jobs) - 1:
+                marker = "+"
+
+            elif i == len(displayed_jobs) - 2:
+                marker = "-"
+
+            else:
+                marker = " "
+
+            command_text = job["command"]
+
+            if status == "Done":
+                command_text = command_text.replace(" &", "")
 
             print(
-                f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
+                f"[{job['job_id']}]{marker}  {status:<24}{command_text}"
             )
+
+    # remove completed jobs AFTER printing them
+        jobs_list[:] = [
+            job for job in jobs_list
+            if job["process"].poll() is None
+        ]   
     
     # type
     elif cmd == "type":
