@@ -206,17 +206,15 @@ def execute_command(command):
 
             marker = " "
 
-            if count == 1:
-                marker = "+"
-            elif i == count - 1:
-                marker = "+"
-            elif i == count - 2:
-                marker = "-"
+            if count >= 2:
+                if i == count - 1:
+                    marker = "+"
+                elif i == count - 2:
+                    marker = "-"
 
             print(
                 f"[{job['job_id']}]{marker}  {'Running':<24}{job['command']}"
-            )         
-    
+            )       
     # type
     elif cmd == "type":
 
